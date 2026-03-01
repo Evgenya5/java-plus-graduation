@@ -1,0 +1,47 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: main_service_route
+          uri: lb://MAIN-SERVICE
+          predicates:
+            - Path=/admin/**,/users/**,/events,/events/**,/categories,/categories/**,/compilations,/compilations/**,/comments/**
+          filters:
+            - RewritePath=/main-service/(?<segment>.*), /api/v1/main-service/$\{segment}
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,routes,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    gateway:
+      enabled: true
+    routes:
+      enabled: true
+    beans:
+      enabled: true
+    env:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    com.netflix.discovery: INFO
