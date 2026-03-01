@@ -11,6 +11,5 @@ spring:
             - classpath:config/core/{application}
             - classpath:config/stats/{application}
             - classpath:config/infra/{application}
-
 server:
-  port: 8888
+  port: 0
