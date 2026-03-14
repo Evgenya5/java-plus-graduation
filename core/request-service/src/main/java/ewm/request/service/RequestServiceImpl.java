@@ -255,7 +255,7 @@ public class RequestServiceImpl implements RequestService {
         return userClient.getUserById(userId);
     }
 
-    private InternalEventDto getEventEntity(Long userId) {
-        return eventClient.getEventById(userId);
+    private InternalEventDto getEventEntity(Long eventId) {
+        return eventClient.getEventById(eventId);
     }
 }
