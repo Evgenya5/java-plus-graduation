@@ -4,8 +4,8 @@ import ewm.dto.compilation.CompilationDto;
 import ewm.dto.compilation.CreateCompilationDto;
 import ewm.dto.compilation.UpdateCompilationDto;
 import ewm.dto.event.EventShortDto;
-import ewm.exception.ConflictException;
-import ewm.exception.NotFoundException;
+import ewm.common.exception.ConflictException;
+import ewm.common.exception.NotFoundException;
 import ewm.mapper.compilation.CompilationMapper;
 import ewm.mapper.event.EventMapper;
 import ewm.model.compilation.Compilation;
@@ -49,7 +49,7 @@ public class CompilationServiceImpl implements CompilationService {
         } else compilation.setEvents(new HashSet<>());
         Compilation savedCompilation = compilationRepository.save(compilation);
         HashSet<EventShortDto> eventShortDtos = new HashSet<>(savedCompilation.getEvents().stream().map(event ->
-                eventMapper.toShortDto(event,0,0)).toList());
+                eventMapper.toShortDto(event,0,0, null)).toList());
         return compilationMapper.toDto(savedCompilation, eventShortDtos);
     }
 
@@ -84,7 +84,7 @@ public class CompilationServiceImpl implements CompilationService {
             }
         }
         HashSet<EventShortDto> eventShortDtos = new HashSet<>(compilation.getEvents().stream().map(event ->
-                eventMapper.toShortDto(event,0,0)).toList());
+                eventMapper.toShortDto(event,0,0, null)).toList());
         return compilationMapper.toDto(compilationRepository.save(compilation), eventShortDtos);
     }
 
@@ -114,7 +114,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .toList();
         return ordered.stream()
                 .map(compilation -> compilationMapper.toDto(compilation, new HashSet<>(compilation.getEvents().stream().map(event ->
-                        eventMapper.toShortDto(event,0,0)).toList())))
+                        eventMapper.toShortDto(event,0,0, null)).toList())))
                 .toList();
     }
 
@@ -122,7 +122,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getCompilationDtoById(Long compId) {
         Compilation compilation = getCompilationById(compId);
         HashSet<EventShortDto> eventShortDtos = new HashSet<>(compilation.getEvents().stream().map(event ->
-                eventMapper.toShortDto(event,0,0)).toList());
+                eventMapper.toShortDto(event,0,0, null)).toList());
         return compilationMapper.toDto(compilation, eventShortDtos);
     }
 
