@@ -22,9 +22,9 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findAllByEventIdAndStatus(Long eventId, RequestStatus requestStatus);
 
     @Query("""
-            SELECT NEW ewm.request.dto.CountConfirmedRequestsByEventId(r.eventId, COUNT(r))
+            SELECT NEW ewm.request.client.dto.CountConfirmedRequestsByEventId(r.eventId, COUNT(r))
             FROM Request r
-            WHERE r.eventId IN :eventIds AND r.status = ewm.model.request.RequestStatus.CONFIRMED
+            WHERE r.eventId IN :eventIds AND r.status = ewm.request.model.RequestStatus.CONFIRMED
             GROUP BY r.eventId"""
     )
     List<CountConfirmedRequestsByEventId> countConfirmedRequestsByEventIds(@Param("eventIds") List<Long> eventIds);
