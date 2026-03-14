@@ -3,10 +3,10 @@ package ewm.user.client.config;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import user.client.exception.AccessDeniedException;
-import user.client.exception.ConflictException;
-import user.client.exception.NotFoundException;
-import user.client.exception.ValidationException;
+import ewm.common.exception.AccessDeniedException;
+import ewm.common.exception.ConflictException;
+import ewm.common.exception.NotFoundException;
+import ewm.common.exception.ValidationException;
 
 import javax.naming.ServiceUnavailableException;
 

@@ -4,11 +4,7 @@ import ewm.dto.event.EventFullDto;
 import ewm.dto.event.EventShortDto;
 import ewm.dto.event.NewEventDto;
 import ewm.dto.event.UpdateEventUserRequest;
-import ewm.dto.request.UpdateStatusRequestDtoReq;
-import ewm.dto.request.UpdateStatusRequestDtoResp;
-import ewm.dto.request.UserRequestDto;
 import ewm.service.event.EventService;
-import ewm.service.request.RequestService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +23,6 @@ import java.util.List;
 public class PrivateEventController {
 
     private final EventService eventService;
-    private final RequestService requestService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -58,18 +53,5 @@ public class PrivateEventController {
         // получаем ip арес вызова сервиса
         String ip = request.getRemoteAddr();
         return eventService.getUserEvent(userId, eventId, ip);
-    }
-
-    @GetMapping("/{eventId}/requests")
-    public List<UserRequestDto> getRequestsByEventId(@PathVariable("userId") Long userId,
-                                                   @PathVariable("eventId") Long eventId) {
-        return requestService.getRequestsByEventId(userId, eventId);
-    }
-
-    @PatchMapping("/{eventId}/requests")
-    public UpdateStatusRequestDtoResp updateRequestStatus(@PathVariable("userId") Long userId,
-                                                          @PathVariable("eventId") Long eventId,
-                                                          @RequestBody UpdateStatusRequestDtoReq request) {
-        return requestService.updateRequestStatus(userId, eventId, request);
     }
 }
