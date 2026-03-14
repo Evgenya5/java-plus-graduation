@@ -11,7 +11,14 @@
 
     <packaging>pom</packaging>
     <modules>
-        <module>main-service</module>
+        <module>event-service</module>
+        <module>user-service</module>
+        <module>user-client</module>
+        <module>common</module>
+        <module>request-service</module>
+        <module>comment-service</module>
+        <module>event-client</module>
+        <module>request-client</module>
     </modules>
 
     <artifactId>core</artifactId>
