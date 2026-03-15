@@ -109,7 +109,8 @@ public class EventServiceImpl implements EventService {
 
         if (events.isEmpty()) return List.of();
 
-        return getEventsFullDtoWithStats(events);
+        return List.of();
+        //return getEventsFullDtoWithStats(events);
     }
 
     @Override
