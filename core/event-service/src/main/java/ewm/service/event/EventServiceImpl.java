@@ -105,12 +105,11 @@ public class EventServiceImpl implements EventService {
         validateRangeStartAndEnd(request.getRangeStart(), request.getRangeEnd());
 
         Specification<Event> specification = buildAdminSpecification(request);
-        //List<Event> events = eventRepository.findAll(specification, pageable).getContent();
+        List<Event> events = eventRepository.findAll(specification, pageable).getContent();
 
-        //if (events.isEmpty()) return List.of();
+        if (events.isEmpty()) return List.of();
 
-        return List.of();
-        //return getEventsFullDtoWithStats(events);
+        return getEventsFullDtoWithStats(events);
     }
 
     @Override
