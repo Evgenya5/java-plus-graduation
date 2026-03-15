@@ -1,5 +1,6 @@
 package ewm.user.service;
 
+import ewm.common.exception.ConflictException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         log.debug("createUser(userDto={})", userDto);
+        if (repository.existsByEmail(userDto.getEmail())) {
+            throw new ConflictException("User with this email already exists");
+        }
 
         User user = repository.save(userMapper.toUser(userDto));
         return userMapper.toUserDto(user);

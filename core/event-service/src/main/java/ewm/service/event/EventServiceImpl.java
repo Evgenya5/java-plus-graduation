@@ -334,7 +334,6 @@ public class EventServiceImpl implements EventService {
         if (initiatorDtos == null) initiatorDtos = Collections.emptyList();
         Map<Long, UserShortDto> initiatorMap = initiatorDtos.stream()
                 .collect(Collectors.toMap(UserDto::getId, this::toUserShortDto));
-        Map<Long, UserShortDto> finalInitiatorMap = initiatorMap;
         Map<Long, Integer> confirmedRequestsCount = getConfirmedRequests(eventIds);
         LocalDateTime startDate = getEarliestEventDate(events);
         Map<Long, Long> views = getViews(eventIds, startDate);
@@ -344,7 +343,7 @@ public class EventServiceImpl implements EventService {
                         event,
                         confirmedRequestsCount.getOrDefault(event.getId(), 0),
                         views.getOrDefault(event.getId(), 0L),
-                        finalInitiatorMap.getOrDefault(event.getInitiatorId(), toUnknownUserShortDto(event.getInitiatorId()))
+                        initiatorMap.getOrDefault(event.getInitiatorId(), null)
                 ))
                 .toList();
     }
@@ -471,7 +470,7 @@ public class EventServiceImpl implements EventService {
                         event,
                         confirmedRequestsCount.getOrDefault(event.getId(), 0),
                         views.getOrDefault(event.getId(), 0L),
-                        initiatorMap.getOrDefault(event.getInitiatorId(), toUnknownUserShortDto(event.getInitiatorId()))
+                        initiatorMap.getOrDefault(event.getInitiatorId(), null)
                 ))
                 .toList();
     }
