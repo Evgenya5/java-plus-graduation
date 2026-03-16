@@ -352,8 +352,7 @@ public class EventServiceImpl implements EventService {
         return events.stream()
                 .filter(event -> event.getPublishedOn() != null)
                 .min(Comparator.comparing(Event::getPublishedOn))
-                .orElseThrow(() -> new IllegalStateException("Events list is empty"))
-                .getCreatedOn();
+                .get().getPublishedOn();
     }
 
     private void handleAdminStateAction(Event event, StateAdminAction stateAction) {

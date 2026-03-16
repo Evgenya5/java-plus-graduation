@@ -2,9 +2,9 @@ package ewm.request.service;
 
 import ewm.common.exception.ConflictException;
 import ewm.event.client.dto.InternalEventDto;
-import ewm.request.ResilientEventClient;
+import ewm.request.client.ResilientEventClient;
 import ewm.event.client.dto.EventState;
-import ewm.request.ResilientUserClient;
+import ewm.request.client.ResilientUserClient;
 import ewm.request.client.dto.CountConfirmedRequestsByEventId;
 import ewm.request.dto.UpdateStatusRequestDtoReq;
 import ewm.request.dto.UpdateStatusRequestDtoResp;

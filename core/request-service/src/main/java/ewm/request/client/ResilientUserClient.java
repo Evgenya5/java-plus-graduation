@@ -1,4 +1,4 @@
-package ewm.request;
+package ewm.request.client;
 
 import ewm.user.client.UserClient;
 import ewm.user.client.dto.UserDto;
