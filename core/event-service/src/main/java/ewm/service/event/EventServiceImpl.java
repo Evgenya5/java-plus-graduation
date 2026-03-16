@@ -348,16 +348,9 @@ public class EventServiceImpl implements EventService {
                 .toList();
     }
 
-    private UserShortDto toUnknownUserShortDto(Long id) {
-        UserShortDto dto = new UserShortDto();
-        dto.setId(id);
-        dto.setName("Unknown");
-        return dto;
-    }
-
     private LocalDateTime getEarliestEventDate(List<Event> events) {
         return events.stream()
-                .min(Comparator.comparing(Event::getCreatedOn))
+                .min(Comparator.comparing(Event::getPublishedOn))
                 .orElseThrow(() -> new IllegalStateException("Events list is empty"))
                 .getCreatedOn();
     }
