@@ -172,13 +172,20 @@ public class EventServiceImpl implements EventService {
     private Map<Long, Integer> getConfirmedRequests(List<Long> eventIds) {
         if (eventIds.isEmpty()) return Map.of();
 
-        List<CountConfirmedRequestsByEventId> events = requestClient.countConfirmedRequestsByEventIds(eventIds);
-        Map<Long, Integer> confirmedRequests = eventIds.stream()
-                .collect(Collectors.toMap(id -> id, id -> 0));
+        try {
+            List<CountConfirmedRequestsByEventId> events = requestClient.countConfirmedRequestsByEventIds(eventIds);
+            if (events == null) {
+                return Map.of();
+            }
+            Map<Long, Integer> confirmedRequests = eventIds.stream()
+                    .collect(Collectors.toMap(id -> id, id -> 0));
+            events.forEach(dto -> confirmedRequests.put(dto.getEventId(), dto.getCountConfirmedRequests()));
+            return confirmedRequests;
 
-        events.forEach(dto -> confirmedRequests.put(dto.getEventId(), dto.getCountConfirmedRequests()));
-
-        return confirmedRequests;
+        } catch (Exception e) {
+            //Не смогли получить количество подтверждённых запросов для событий
+            return Map.of();
+        }
     }
 
     private void saveHit(String path, String ip) {
