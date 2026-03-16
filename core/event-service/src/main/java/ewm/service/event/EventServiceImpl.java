@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ewm.common.exception.*;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -350,9 +347,8 @@ public class EventServiceImpl implements EventService {
 
     private LocalDateTime getEarliestEventDate(List<Event> events) {
         return events.stream()
-                .filter(event -> event.getPublishedOn() != null)
                 .min(Comparator.comparing(Event::getPublishedOn))
-                .get().getPublishedOn();
+                .map(Event::getPublishedOn).orElse(null);
     }
 
     private void handleAdminStateAction(Event event, StateAdminAction stateAction) {
