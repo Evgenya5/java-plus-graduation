@@ -1,4 +1,4 @@
-package ewm.request.client;
+package ewm.request;
 
 import ewm.event.client.EventClient;
 import ewm.event.client.dto.InternalEventDto;
