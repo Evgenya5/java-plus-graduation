@@ -190,7 +190,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private Map<Long, Long> getViews(List<Long> eventIds, LocalDateTime start) {
-        if (eventIds.isEmpty()) return Map.of();
+        if (eventIds.isEmpty() || start == null) return Map.of();
 
         List<String> uris = eventIds.stream()
                 .map(id -> "/events/" + id)
@@ -350,6 +350,7 @@ public class EventServiceImpl implements EventService {
 
     private LocalDateTime getEarliestEventDate(List<Event> events) {
         return events.stream()
+                .filter(event -> event.getPublishedOn() != null)
                 .min(Comparator.comparing(Event::getPublishedOn))
                 .orElseThrow(() -> new IllegalStateException("Events list is empty"))
                 .getCreatedOn();
