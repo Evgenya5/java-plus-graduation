@@ -187,7 +187,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private Map<Long, Long> getViews(List<Long> eventIds, LocalDateTime start) {
-        if (eventIds.isEmpty() || start == null) return Map.of();
+        if (eventIds.isEmpty() || start.isAfter(LocalDateTime.now())) return Map.of();
 
         List<String> uris = eventIds.stream()
                 .map(id -> "/events/" + id)
@@ -346,9 +346,11 @@ public class EventServiceImpl implements EventService {
     }
 
     private LocalDateTime getEarliestEventDate(List<Event> events) {
+
         return events.stream()
+                .filter(o -> o.getPublishedOn() != null)
                 .min(Comparator.comparing(Event::getPublishedOn))
-                .map(Event::getPublishedOn).orElse(null);
+                .map(Event::getPublishedOn).orElse(LocalDateTime.of(2999, 1,1,0, 0));
     }
 
     private void handleAdminStateAction(Event event, StateAdminAction stateAction) {
