@@ -34,10 +34,24 @@ public class PublicEventController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEventByIdPublic(@PathVariable("id") Long eventId, HttpServletRequest request) {
+    public EventFullDto getEventByIdPublic(@PathVariable("id") Long eventId,
+                                           @RequestHeader("X-EWM-USER-ID") Long userId) {
         log.debug("getEventByIdPublic eventId = {}", eventId);
         // получаем ip арес вызова сервиса
-        String ip = request.getRemoteAddr();
-        return eventService.getEventByIdPublic(eventId, ip);
+       // String ip = request.getRemoteAddr();
+        return eventService.getEventByIdPublic(eventId, userId);
+    }
+
+    @PutMapping("/{eventId}/like")
+    public void likeEvent(@PathVariable Long eventId,
+                          @RequestHeader("X-EWM-USER-ID") Long userId) {
+        log.debug("likeEvent userId = {}, eventId = {}", userId, eventId);
+        eventService.likeEvent(userId, eventId);
+    }
+
+    @GetMapping("/recommendations")
+    public List<EventShortDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId) {
+        log.debug("getRecommendations for userId = {}", userId);
+        return eventService.getRecommendedEvents(userId);
     }
 }
