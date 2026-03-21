@@ -11,7 +11,7 @@ spring:
         max-interval: 6000
       discovery:
         enabled: true
-        service-id: config-server
+        serviceId: config-server
 
 eureka:
   client:
