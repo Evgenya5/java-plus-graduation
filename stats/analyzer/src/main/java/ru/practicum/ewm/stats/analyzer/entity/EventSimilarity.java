@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Entity
-@Table(name = "event_similarity", schema = "stats")
+@Table(name = "event_similarity")
 @IdClass(EventSimilarityId.class)
 @Getter
 @Setter

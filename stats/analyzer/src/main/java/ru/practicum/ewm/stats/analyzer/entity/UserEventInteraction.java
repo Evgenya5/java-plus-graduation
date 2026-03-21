@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_event_interaction", schema = "stats")
+@Table(name = "user_event_interaction")
 @IdClass(UserEventInteractionId.class)
 @Getter
 @Setter
