@@ -162,7 +162,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByIdPublic(Long eventId, Long userId) {
         Event event = getPublishedEventEntity(eventId);
-       // collectUserAction(userId, eventId, ActionTypeProto.ACTION_VIEW);
         return getEventFullDtoWithStats(event);
     }
 
