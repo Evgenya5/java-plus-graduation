@@ -1,9 +1,6 @@
 package ewm.service.event;
 
-import dto.GetStatsDto;
-import dto.SaveHitDto;
 import ewm.client.ResilientRequestClient;
-import ewm.client.ResilientStatsClient;
 import ewm.client.ResilientUserClient;
 import ewm.dto.event.*;
 import ewm.mapper.event.EventMapper;
@@ -25,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ewm.common.exception.*;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +37,6 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
     private final ResilientRequestClient requestClient;
-    private final ResilientStatsClient statsClient;
 
     @Override
     @Transactional
@@ -87,7 +84,7 @@ public class EventServiceImpl implements EventService {
         validateUserIsInitiator(event, userId);
 
         EventFullDto result = getEventFullDtoWithStats(event);
-        saveHit("/events/" + eventId, ip);
+        //saveHit("/events/" + eventId, ip);
         return result;
     }
 
@@ -151,7 +148,7 @@ public class EventServiceImpl implements EventService {
             confirmedRequestsForStats = confirmed;
         }
 
-        saveHit("/events", ip);
+        //saveHit("/events", ip);
 
         List<EventShortDto> result = getEventsShortDtoWithStats(events, confirmedRequestsForStats);
         return sortEvents(result, request.getSort());
@@ -160,7 +157,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByIdPublic(Long eventId, String ip) {
         Event event = getPublishedEventEntity(eventId);
-        saveHit("/events/" + eventId, ip);
+       // saveHit("/events/" + eventId, ip);
         return getEventFullDtoWithStats(event);
     }
 
@@ -188,10 +185,10 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void saveHit(String path, String ip) {
+   /* private void saveHit(String path, String ip) {
         SaveHitDto endpointHitDto = new SaveHitDto("ewm-service", path, ip, LocalDateTime.now());
         statsClient.saveHit(endpointHitDto);
-    }
+    }*/
 
     private Map<Long, Long> getViews(List<Long> eventIds, LocalDateTime start) {
         if (eventIds.isEmpty() || start.isAfter(LocalDateTime.now())) return Map.of();
@@ -201,11 +198,11 @@ public class EventServiceImpl implements EventService {
                 .toList();
         LocalDateTime end = LocalDateTime.now();
 
-        List<GetStatsDto> stats = statsClient.getStats(start, end, uris, true);
+        //List<GetStatsDto> stats = statsClient.getStats(start, end, uris, true);
 
         Map<Long, Long> views = eventIds.stream()
                 .collect(Collectors.toMap(id -> id, id -> 0L));
-
+/*
         if (stats != null && !stats.isEmpty()) {
             stats.forEach(stat -> {
                 long eventId;
@@ -218,7 +215,7 @@ public class EventServiceImpl implements EventService {
                     views.put(eventId, stat.getHits());
                 }
             });
-        }
+        }*/
         return views;
     }
 
