@@ -1,4 +1,4 @@
-@namespace("ru.yandex.practicum.ewm.stats.avro")
+@namespace("ru.practicum.ewm.stats.avro")
 protocol UserActionsProtocol {
 
     enum ActionTypeAvro {
