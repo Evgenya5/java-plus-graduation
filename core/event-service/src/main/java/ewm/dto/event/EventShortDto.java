@@ -23,4 +23,5 @@ public class EventShortDto {
     private UserShortDto initiator; // id, name
     private Integer confirmedRequests; // пока 0
     private Long views; // пока 0
+    private Double rating; // рейтинг
 }
