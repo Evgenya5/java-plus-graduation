@@ -28,6 +28,7 @@ import stats.client.UserActionGrpcClient;
 import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 import ru.practicum.ewm.stats.proto.ActionTypeProto;
 
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -161,8 +162,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByIdPublic(Long eventId, Long userId) {
         Event event = getPublishedEventEntity(eventId);
-       // saveHit("/events/" + eventId, ip);
-        collectUserAction(userId, eventId, ActionTypeProto.ACTION_VIEW);
+       // collectUserAction(userId, eventId, ActionTypeProto.ACTION_VIEW);
         return getEventFullDtoWithStats(event);
     }
 
@@ -229,11 +229,6 @@ public class EventServiceImpl implements EventService {
             return Map.of();
         }
     }
-
-   /* private void saveHit(String path, String ip) {
-        SaveHitDto endpointHitDto = new SaveHitDto("ewm-service", path, ip, LocalDateTime.now());
-        statsClient.saveHit(endpointHitDto);
-    }*/
 
     private Map<Long, Long> getViews(List<Long> eventIds, LocalDateTime start) {
         if (eventIds.isEmpty() || start.isAfter(LocalDateTime.now())) return Map.of();
