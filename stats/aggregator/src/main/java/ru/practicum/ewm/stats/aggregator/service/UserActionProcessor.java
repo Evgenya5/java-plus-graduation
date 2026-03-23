@@ -15,7 +15,7 @@ import java.util.List;
 public class UserActionProcessor {
 
     private final SimilarityState state;
-    private final ActionWeightResolver weightResolver;
+    private final ActionWeightResolver weightResolver = new ActionWeightResolver();
     private final EventSimilarityProducer producer;
 
     public void process(UserActionAvro action) {
