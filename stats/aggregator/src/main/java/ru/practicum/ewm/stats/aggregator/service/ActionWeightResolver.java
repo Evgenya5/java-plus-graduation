@@ -1,9 +1,7 @@
 package ru.practicum.ewm.stats.aggregator.service;
 
-import org.springframework.stereotype.Component;
 import ru.practicum.ewm.stats.avro.ActionTypeAvro;
 
-@Component
 public class ActionWeightResolver {
 
     private static final double WEIGHT_VIEW = 0.4;
