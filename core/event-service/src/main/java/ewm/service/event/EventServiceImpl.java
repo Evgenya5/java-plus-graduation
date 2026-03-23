@@ -129,7 +129,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventsPublic(GetEventPublicRequest request, Pageable pageable, String ip) {
+    public List<EventShortDto> getEventsPublic(GetEventPublicRequest request, Pageable pageable) {
         validateRangeStartAndEnd(request.getRangeStart(), request.getRangeEnd());
 
         Specification<Event> specification = buildPublicSpecification(request);
