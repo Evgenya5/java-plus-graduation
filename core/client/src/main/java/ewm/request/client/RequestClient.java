@@ -15,5 +15,9 @@ public interface RequestClient {
     List<CountConfirmedRequestsByEventId> countConfirmedRequestsByEventIds(
             @RequestParam("eventIds") List<Long> eventIds
     );
+
+    @GetMapping("/internal/requests/visited")
+    boolean hasUserVisitedEvent(@RequestParam("userId") Long userId,
+                                @RequestParam("eventId") Long eventId);
 }
 

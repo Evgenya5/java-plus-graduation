@@ -1,9 +1,6 @@
 package ewm.service.event;
 
-import dto.GetStatsDto;
-import dto.SaveHitDto;
 import ewm.client.ResilientRequestClient;
-import ewm.client.ResilientStatsClient;
 import ewm.client.ResilientUserClient;
 import ewm.dto.event.*;
 import ewm.mapper.event.EventMapper;
@@ -25,6 +22,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ewm.common.exception.*;
+import stats.client.RecommendationsGrpcClient;
+import stats.client.UserActionGrpcClient;
+
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
+
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +44,9 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
     private final ResilientRequestClient requestClient;
-    private final ResilientStatsClient statsClient;
+    private final UserActionGrpcClient userGrpcClient;
+    private final RecommendationsGrpcClient recommendationsGrpcClient;
+
 
     @Override
     @Transactional
@@ -85,10 +92,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getUserEvent(Long userId, Long eventId, String ip) {
         Event event = getEventEntity(eventId);
         validateUserIsInitiator(event, userId);
-
-        EventFullDto result = getEventFullDtoWithStats(event);
-        saveHit("/events/" + eventId, ip);
-        return result;
+        return getEventFullDtoWithStats(event);
     }
 
     @Override
@@ -125,7 +129,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventsPublic(GetEventPublicRequest request, Pageable pageable, String ip) {
+    public List<EventShortDto> getEventsPublic(GetEventPublicRequest request, Pageable pageable) {
         validateRangeStartAndEnd(request.getRangeStart(), request.getRangeEnd());
 
         Specification<Event> specification = buildPublicSpecification(request);
@@ -151,18 +155,61 @@ public class EventServiceImpl implements EventService {
             confirmedRequestsForStats = confirmed;
         }
 
-        saveHit("/events", ip);
-
         List<EventShortDto> result = getEventsShortDtoWithStats(events, confirmedRequestsForStats);
         return sortEvents(result, request.getSort());
     }
 
     @Override
-    public EventFullDto getEventByIdPublic(Long eventId, String ip) {
+    public EventFullDto getEventByIdPublic(Long eventId, Long userId) {
         Event event = getPublishedEventEntity(eventId);
-        saveHit("/events/" + eventId, ip);
         return getEventFullDtoWithStats(event);
     }
+
+    @Transactional
+    @Override
+    public void likeEvent(Long userId, Long eventId) {
+        getPublishedEventEntity(eventId);
+        boolean visited = requestClient.userHasVisitedEvent(userId, eventId);
+        if (!visited) {
+            throw new BusinessRuleException("Пользователь может лайкать только посещённые им мероприятия");
+        }
+        collectUserAction(userId, eventId, ActionTypeProto.ACTION_LIKE);
+    }
+
+    @Override
+    public List<EventShortDto> getRecommendedEvents(Long userId, int size) {
+        List<RecommendedEventProto> recommendations;
+        try {
+
+            recommendations = recommendationsGrpcClient.getRecommendationsForUser(userId, size);
+        } catch (Exception e) {
+            return List.of();
+        }
+        if (recommendations.isEmpty()) {
+            return List.of();
+        }
+        List<Long> eventIds = recommendations.stream()
+                .map(RecommendedEventProto::getEventId)
+                .toList();
+        List<Event> events = eventRepository.findAllById(eventIds);
+        if (events.isEmpty()) {
+            return List.of();
+        }
+        //получаем рейтинг
+        Map<Long, Double> ratingByEventId = recommendations.stream()
+                .collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+        List<EventShortDto> dtos = getEventsShortDtoWithStats(events, getConfirmedRequests(eventIds));
+
+        return dtos.stream()
+                .peek(dto -> dto.setRating(ratingByEventId.getOrDefault(dto.getId(),
+                        dto.getRating() != null ? dto.getRating() : 0.0)))
+                .toList();
+    }
+
+    private  void collectUserAction(Long userId, Long eventId, ActionTypeProto actionType) {
+        userGrpcClient.collectUserAction(userId, eventId, actionType, Instant.now());
+    }
+
 
     private void validateRangeStartAndEnd(LocalDateTime rangeStart, LocalDateTime rangeEnd) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd))
@@ -188,11 +235,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void saveHit(String path, String ip) {
-        SaveHitDto endpointHitDto = new SaveHitDto("ewm-service", path, ip, LocalDateTime.now());
-        statsClient.saveHit(endpointHitDto);
-    }
-
     private Map<Long, Long> getViews(List<Long> eventIds, LocalDateTime start) {
         if (eventIds.isEmpty() || start.isAfter(LocalDateTime.now())) return Map.of();
 
@@ -201,24 +243,9 @@ public class EventServiceImpl implements EventService {
                 .toList();
         LocalDateTime end = LocalDateTime.now();
 
-        List<GetStatsDto> stats = statsClient.getStats(start, end, uris, true);
 
         Map<Long, Long> views = eventIds.stream()
                 .collect(Collectors.toMap(id -> id, id -> 0L));
-
-        if (stats != null && !stats.isEmpty()) {
-            stats.forEach(stat -> {
-                long eventId;
-                try {
-                    eventId = Long.parseLong(stat.getUri().substring("/events".length() + 1));
-                } catch (Exception e) {
-                    eventId = -1L;
-                }
-                if (eventId >= 0) {
-                    views.put(eventId, stat.getHits());
-                }
-            });
-        }
         return views;
     }
 

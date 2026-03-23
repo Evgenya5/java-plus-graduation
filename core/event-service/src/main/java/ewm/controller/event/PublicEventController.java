@@ -23,21 +23,32 @@ public class PublicEventController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> getEventsPublic(@ModelAttribute @Valid GetEventPublicRequest request, HttpServletRequest httpRequest) {
+    public List<EventShortDto> getEventsPublic(@ModelAttribute @Valid GetEventPublicRequest request) {
         int size = (request.getSize() != null && request.getSize() > 0) ? request.getSize() : 10;
         int from = request.getFrom() != null ? request.getFrom() : 0;
         PageRequest pageRequest = PageRequest.of(from / size, size);
         log.debug("getEventsPublic request = {}", request);
-        // получаем ip арес вызова сервиса
-        String ip = httpRequest.getRemoteAddr();
-        return eventService.getEventsPublic(request, pageRequest, ip);
+        return eventService.getEventsPublic(request, pageRequest);
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEventByIdPublic(@PathVariable("id") Long eventId, HttpServletRequest request) {
+    public EventFullDto getEventByIdPublic(@PathVariable("id") Long eventId,
+                                           @RequestHeader("X-EWM-USER-ID") Long userId) {
         log.debug("getEventByIdPublic eventId = {}", eventId);
-        // получаем ip арес вызова сервиса
-        String ip = request.getRemoteAddr();
-        return eventService.getEventByIdPublic(eventId, ip);
+        return eventService.getEventByIdPublic(eventId, userId);
+    }
+
+    @PutMapping("/{eventId}/like")
+    public void likeEvent(@PathVariable Long eventId,
+                          @RequestHeader("X-EWM-USER-ID") Long userId) {
+        log.debug("likeEvent userId = {}, eventId = {}", userId, eventId);
+        eventService.likeEvent(userId, eventId);
+    }
+
+    @GetMapping("/recommendations")
+    public List<EventShortDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId,
+                                                  @RequestParam(defaultValue = "10") int size) {
+        log.debug("getRecommendations for userId = {}", userId);
+        return eventService.getRecommendedEvents(userId, size);
     }
 }
