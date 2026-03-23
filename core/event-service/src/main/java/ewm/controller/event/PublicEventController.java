@@ -46,8 +46,9 @@ public class PublicEventController {
     }
 
     @GetMapping("/recommendations")
-    public List<EventShortDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId) {
+    public List<EventShortDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId,
+                                                  @RequestParam(defaultValue = "10") int size) {
         log.debug("getRecommendations for userId = {}", userId);
-        return eventService.getRecommendedEvents(userId);
+        return eventService.getRecommendedEvents(userId, size);
     }
 }

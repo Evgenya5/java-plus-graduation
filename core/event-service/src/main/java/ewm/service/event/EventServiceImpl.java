@@ -177,8 +177,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getRecommendedEvents(Long userId) {
-        List<RecommendedEventProto> recommendations = recommendationsGrpcClient.getRecommendationsForUser(userId, 20);
+    public List<EventShortDto> getRecommendedEvents(Long userId, int size) {
+        List<RecommendedEventProto> recommendations;
+        try {
+
+            recommendations = recommendationsGrpcClient.getRecommendationsForUser(userId, size);
+        } catch (Exception e) {
+            return List.of();
+        }
         if (recommendations.isEmpty()) {
             return List.of();
         }

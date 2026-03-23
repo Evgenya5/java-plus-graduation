@@ -28,5 +28,5 @@ public interface EventService {
     @Transactional
     void likeEvent(Long userId, Long eventId);
 
-    List<EventShortDto> getRecommendedEvents(Long userId);
+    List<EventShortDto> getRecommendedEvents(Long userId, int size);
 }
